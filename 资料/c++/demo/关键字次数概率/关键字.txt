@@ -1,0 +1,277 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include "cJSON.h"
+#define N 100000
+
+double probability(int num, int LEN, int TLEN, int num1, int NUM) {
+	double a;
+	a = (num * (LEN - NUM / 2))* 1.0 / (TLEN - num1);
+	return a;
+}
+
+void countstr(char * key, char *path, char *countWordText, char *ratioWordText) {
+	char filename[50];
+	sprintf(filename, "D:/1/key.txt");
+	FILE *pf = NULL;
+	pf = fopen(filename, "wb+");
+	fwrite(key, 1, strlen(key), pf);
+	fclose(pf);
+	printf("%s\n\n\n", key);
+
+	char filename1[50];
+	sprintf(filename1, "D:/1/path.txt");
+	FILE *pf1 = NULL;
+	pf1 = fopen(filename1, "wb+");
+	fwrite(path, 1, strlen(path), pf1);
+	fclose(pf1);
+	printf("%s\n\n\n", path);
+
+	int  a, i, LENN,  LEN, len;
+	int  j = 0, k = 0, num = 0, NUM = 0, num1 = 0, zcd = 0;
+	char *str1, *str2, *out, *out1;
+	char ch;
+	double(*arr)[2] = (double(*)[2])malloc(sizeof(int) * N * 2);
+	double p;
+	cJSON *root = cJSON_CreateObject();
+	cJSON *root1 = cJSON_CreateObject();
+	str1 = new char[N];
+	memset(str1, 0, N * sizeof(char));
+	LENN = strlen(key);
+	int b;
+	for (b = 0; b < LENN + 1; b++) {
+		if ((key[b]) == '|' && (key[b + 1]) == '@' && (key[b + 2]) == '|' || (key[b]) == '\0')
+		{
+			LEN = strlen(str1);//关键字字节长度LEN
+							   //关键字文字个数 NUM/2
+			int a = 0;
+			NUM = 0;
+			while ((ch = str1[a]) != '\0')
+			{
+				if (ch < 0)
+					NUM++;
+				a++;
+			}
+			a = 0;
+			//文档字节长度len
+			len = strlen(path);
+			//文档文字个数num1
+			int counts = 0, space = 0, enter = 0;
+			while ((ch = path[a]) != '\0')
+			{
+				if (ch < 0)
+					counts++;
+				else if (ch == ' ')
+					space++;
+				else if (ch == '\n')
+					enter++;
+				a++;
+			}
+			num1 = counts / 2;
+
+			/***************频率*******************/
+			for (i = 0; i < len; i++)
+			{
+				if (path[i] == str1[0])
+				{
+					if (LEN > 1)
+					{
+						j = i + 1;
+						int k = 1;
+						for (j; j < len + 1; j++)
+						{
+							if (path[j] == str1[k])
+							{
+								if (LEN == (j - i + 1))
+								{
+									num++;
+								}
+								k++;
+							}
+							else
+							{
+								i = j - 1;
+								break;
+							}
+						}
+					}
+					else
+					{
+						num++;
+					}
+
+				}
+			}
+			cJSON *array = NULL;
+			cJSON *array1 = NULL;
+			char *s = (char *)malloc(sizeof(char) * 1024);
+			sprintf(s, "%d", num);
+			cJSON_AddStringToObject(root, str1, s);
+			if (len == 0) {
+				printf("所查找的文档为空！\n");
+			}
+			else {
+				p = probability(num, LEN, len, num1, NUM);
+				char *m = (char *)malloc(sizeof(char) * 1024);
+				sprintf(m, "%lf", p);
+				cJSON_AddStringToObject(root1, str1, m);
+				//cJSON_AddNumberToObject(root1, str1, p);
+			}
+			memset(str1, 0, N * sizeof(char));
+			b = b + 2;
+			k = b + 1;
+			num = 0;
+			printf("\n");
+		}
+		else {
+			if (k == 0) {
+				str1[b] = key[b];
+			}
+			else {
+				str1[b - k] = key[b];
+			}
+		}
+
+	}
+	delete str1;
+	zcd = len - num1;
+	//cJSON_AddNumberToObject(child, "总长度", zcd);
+	out = cJSON_Print(root);
+	out1 = cJSON_Print(root1);
+	strcpy(countWordText,out);
+	strcpy(ratioWordText, out1);
+	printf("%s\n\n\n", countWordText);
+	printf("%s", ratioWordText);
+}
+void countstrNew(char * key, char *path, char **result) {
+	int  a, i, LENN, LEN, len;
+	int  j = 0, k = 0, num = 0, NUM = 0, num1 = 0, zcd = 0;
+	char *str1, *str2, *out;
+	char ch;
+	double(*arr)[2] = (double(*)[2])malloc(sizeof(int) * N * 2);
+	double p;
+	cJSON *root = cJSON_CreateObject();
+	cJSON *child = cJSON_CreateArray();
+	child = cJSON_CreateObject();
+	str1 = new char[N];
+	memset(str1, 0, N * sizeof(char));
+	LENN = strlen(key);
+	int b;
+	for (b = 0; b < LENN + 1; b++) {
+		if ((key[b]) == '|' && (key[b + 1]) == '@' && (key[b + 2]) == '|' || (key[b]) == '\0')
+		{
+			LEN = strlen(str1);//关键字字节长度LEN
+							   //关键字文字个数 NUM/2
+			int a = 0;
+			NUM = 0;
+			while ((ch = str1[a]) != '\0')
+			{
+				if (ch < 0)
+					NUM++;
+				a++;
+			}
+			a = 0;
+			//文档字节长度len
+			len = strlen(path);
+			//文档文字个数num1
+			int counts = 0, space = 0, enter = 0;
+			while ((ch = path[a]) != '\0')
+			{
+				if (ch < 0)
+					counts++;
+				else if (ch == ' ')
+					space++;
+				else if (ch == '\n')
+					enter++;
+				a++;
+			}
+			num1 = counts / 2;
+
+			/***************频率*******************/
+			for (i = 0; i < len; i++)
+			{
+				if (path[i] == str1[0])
+				{
+					if (LEN > 1)
+					{
+						j = i + 1;
+						int k = 1;
+						for (j; j < len + 1; j++)
+						{
+							if (path[j] == str1[k])
+							{
+								if (LEN == (j - i + 1))
+								{
+									num++;
+								}
+								k++;
+							}
+							else
+							{
+								i = j - 1;
+								break;
+							}
+						}
+					}
+					else
+					{
+						num++;
+					}
+
+				}
+			}
+			cJSON *array = NULL;
+			cJSON_AddItemToObject(child, "关键字", array = cJSON_CreateArray());
+			cJSON_AddItemToArray(array, cJSON_CreateString(str1));
+			cJSON_AddItemToObject(child, "次数，概率", root = cJSON_CreateArray());
+			cJSON_AddNumberToObject(root, "次数", num);
+			if (len == 0) {
+				printf("所查找的文档为空！\n");
+			}
+			else {
+				p = probability(num, LEN, len, num1, NUM);
+				cJSON_AddNumberToObject(root, "概率", p);
+
+			}
+			memset(str1, 0, N * sizeof(char));
+			b = b + 2;
+			k = b + 1;
+			num = 0;
+			printf("\n");
+		}
+		else {
+			if (k == 0) {
+				str1[b] = key[b];
+			}
+			else {
+				str1[b - k] = key[b];
+			}
+		}
+
+	}
+	delete str1;
+	zcd = len - num1;
+	cJSON_AddNumberToObject(child, "总长度", zcd);
+	out = cJSON_Print(child);
+	*result = out;
+
+}
+int main() {
+	char *key = "保险业|@|采矿|@|能源|@|餐饮|@|宾馆|@|电讯业|@|房地产";
+	char *path = "保险卡时间看到你发开始的看法呢款式决定开发那几款是否纱礼服你拉了男方保险业";
+	char *result = (char *)malloc(sizeof(char)*1024);
+	memset(result, 0, sizeof(char) * 1024);
+	char *zb = (char *)malloc(sizeof(char) * 1024);
+	memset(result, 0, sizeof(char) * 1024);
+
+	countstr(key, path, result,zb);
+
+//	printf("%s\n\n\n", result);
+//	printf("%s", zb);
+	while (true)
+	{
+
+	}
+	return 0;
+}

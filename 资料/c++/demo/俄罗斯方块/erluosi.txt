@@ -1,0 +1,120 @@
+#include<iostream>
+#include<windows.h>
+#include<conio.h>
+#include <time.h>
+#include<stdlib.h>
+using namespace std;
+
+struct Body 
+{
+	int x, y;
+	Body *next;
+};
+
+class Block
+{
+private:
+	Body *head;
+	int block1_x;//掉下块的坐标
+	int	block1_y;
+	int Count;
+	int Speed;
+public:
+	void Map();
+	void block();
+	void Gaming();
+	Block(int a = 1,b = 1) 
+	{
+		Speed = a;
+	}
+
+//	int over();
+
+};
+
+void SetPos(int i, int j)//设定光标位置
+{
+	COORD pos = { i - 1, j - 1 };//坐标变量
+	HANDLE Out = GetStdHandle(STD_OUTPUT_HANDLE);//获取输出句柄
+	SetConsoleCursorPosition(Out, pos);//设定光标位置
+}
+
+void Block::Map()
+{	
+	int i = 0, Count = 0;
+	for (i = 1; i <= 50; i++)
+	{
+		SetPos(i, 25);
+		cout << "-" << endl;
+		SetPos(i, 1);
+		cout << "-" << endl;
+	}
+	for (i = 2; i < 25; i++)
+	{
+		SetPos(1, i);
+		cout << "|" << endl;
+		SetPos(50, i);
+		cout << "|" << endl;
+	}
+	SetPos(55, 3);
+	cout << "俄罗斯方块" << endl;
+	SetPos(55, 5);
+	cout << "分数：" << Count << endl;	
+}
+
+void Block::block()
+{
+	int q = 0;
+	srand((int)time(0));
+	q = rand() % 2 + 1;
+	if (q == 1)
+	{
+		srand((int)time(0));//用系统时间来做随机数种子
+		block1_x = rand() % 49 + 1;
+		block1_y = 2;
+
+		SetPos(block1_x, block1_y);
+		cout << "*" << endl;
+		for (int i = 1; i < 5; i++)
+		{
+			block1_y++;
+			SetPos(block1_x, block1_y);
+			cout << "*" << endl;
+		}
+	}
+	if (q == 2) 
+	{
+		srand((int)time(0));//用系统时间来做随机数种子
+		block1_x = rand() % 46 + 1;
+		block1_y = 2;
+
+		SetPos(block1_x, block1_y);
+		cout << "*" << endl;
+		for (int i = 1; i < 5; i++)
+		{
+			block1_x++;
+			SetPos(block1_x, block1_y);
+			cout << "*" << endl;
+		}
+	}	
+}
+
+void Block::Gaming()
+{
+	Map();
+	block();
+	while (1)
+	{
+
+
+		Sleep(500 - Speed * 50);
+	}
+}
+
+int main()
+{
+	system("color 0a"); 
+	Block game;
+	game.Gaming();
+	return 0;
+}
